@@ -304,6 +304,82 @@
       z-index: 200;
     }
     .prototype-banner a { color: var(--navy); font-weight: 600; text-decoration: underline; }
+
+    /* ===== HOW IT WORKS GRID ===== */
+    .how-it-works-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+    .how-it-works-sticky { position: sticky; top: 100px; }
+
+    /* ===== MOBILE NAV ===== */
+    .nav-toggle {
+      display: none;
+      background: none; border: none; cursor: pointer;
+      flex-direction: column; gap: 5px; padding: 4px;
+    }
+    .nav-toggle span {
+      display: block; width: 22px; height: 2px;
+      background: white; border-radius: 2px; transition: all 0.3s;
+    }
+    .mobile-menu {
+      display: none;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15,35,71,0.97);
+      z-index: 99;
+      flex-direction: column; align-items: center; justify-content: center;
+      gap: 28px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      color: white; text-decoration: none;
+      font-size: 22px; font-weight: 500;
+      font-family: 'Playfair Display', serif;
+    }
+    .mobile-menu .mobile-close {
+      position: absolute; top: 20px; right: 24px;
+      font-size: 32px; color: white; background: none; border: none; cursor: pointer;
+    }
+    .mobile-menu .nav-cta {
+      background: var(--gold); color: var(--navy);
+      padding: 14px 36px; border-radius: 10px;
+      font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      section { padding: 60px 20px; }
+
+      .nav-toggle { display: flex; }
+
+      .how-it-works-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      .how-it-works-sticky { position: static; }
+
+      .features-grid { grid-template-columns: 1fr; }
+      .sources-grid { grid-template-columns: 1fr 1fr; }
+
+      .hero-counter { flex-wrap: wrap; gap: 16px; justify-content: center; }
+      .counter-item { min-width: 80px; }
+
+      .hero-sub { flex-direction: column; gap: 6px; align-items: center; }
+
+      .problem-grid { grid-template-columns: 1fr; }
+
+      .steps { max-width: 100%; }
+
+      .cta-section h2 { font-size: 26px; }
+    }
+
+    @media (max-width: 480px) {
+      .sources-grid { grid-template-columns: 1fr; }
+      .hero-counter { gap: 12px; padding: 12px 16px; }
+      .prototype-banner { font-size: 13px; padding: 10px 16px; }
+    }
   </style>
 </head>
 <body>
@@ -322,7 +398,19 @@
     <a href="#fonti">Fonti</a>
     <a href="#waitlist" class="nav-cta">Accesso anticipato</a>
   </div>
+  <button class="nav-toggle" id="nav-toggle" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobile-menu">
+  <button class="mobile-close" id="mobile-close">✕</button>
+  <a href="#come-funziona">Come funziona</a>
+  <a href="#funzionalita">Funzionalità</a>
+  <a href="#fonti">Fonti</a>
+  <a href="#waitlist" class="nav-cta">Accesso anticipato</a>
+</div>
 
 <!-- ===== HERO ===== -->
 <section class="hero">
@@ -393,7 +481,7 @@
 
 <!-- ===== HOW IT WORKS ===== -->
 <section id="come-funziona">
-  <div class="container" style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;">
+  <div class="container how-it-works-grid">
     <div>
       <div class="section-label">Come funziona</div>
       <h2 class="section-title">Tre passi per<br>ritrovare le tue radici</h2>
@@ -436,7 +524,7 @@
       </div>
     </div>
 
-    <div style="position:sticky;top:100px;">
+    <div class="how-it-works-sticky">
       <div style="background:linear-gradient(135deg,#1a365d,#2d4a7a);border-radius:20px;padding:32px;color:white;box-shadow:0 20px 60px rgba(26,54,93,0.3);">
         <div style="font-size:13px;opacity:0.6;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px;">Esempio reale</div>
         <div style="background:rgba(255,255,255,0.08);border-radius:12px;padding:18px;margin-bottom:16px;font-size:13px;">
@@ -700,6 +788,12 @@ const mainNav = document.getElementById('main-nav');
 window.addEventListener('scroll', () => {
   mainNav.classList.toggle('scrolled', window.scrollY > 60);
 });
+
+// Mobile menu
+const mobileMenu = document.getElementById('mobile-menu');
+document.getElementById('nav-toggle').addEventListener('click', () => mobileMenu.classList.add('open'));
+document.getElementById('mobile-close').addEventListener('click', () => mobileMenu.classList.remove('open'));
+mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileMenu.classList.remove('open')));
 
 // Fade-in observer
 const observer = new IntersectionObserver(entries => {
