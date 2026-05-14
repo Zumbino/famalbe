@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Famalbe — Scopri le radici della tua famiglia</title>
+  <meta name="description" content="Il primo strumento di intelligenza artificiale per la ricerca genealogica italiana. Fotografia una lapide e ottieni i dati in secondi.">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #1a365d;
+      --navy-light: #2d4a7a;
+      --gold: #c9a84c;
+      --gold-light: #e0c57a;
+      --cream: #faf8f5;
+      --cream-dark: #f0ece4;
+      --white: #ffffff;
+      --text: #2d3748;
+      --text-muted: #718096;
+      --border: #ddd6c8;
+      --success: #276749;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; color: var(--text); background: var(--white); line-height: 1.6; }
+
+    /* ===== NAV ===== */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 16px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: all 0.3s;
+    }
+    nav.scrolled { background: rgba(26,54,93,0.97); backdrop-filter: blur(12px); padding: 12px 40px; box-shadow: 0 2px 20px rgba(0,0,0,0.2); }
+    .nav-logo { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: white; text-decoration: none; }
+    .nav-logo span { color: var(--gold); }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a { color: rgba(255,255,255,0.8); text-decoration: none; font-size: 14.5px; transition: color 0.2s; }
+    .nav-links a:hover { color: white; }
+    .nav-cta {
+      background: var(--gold); color: var(--navy);
+      padding: 9px 22px; border-radius: 8px;
+      font-weight: 600; font-size: 14px; text-decoration: none;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--gold-light); }
+    @media (max-width: 640px) { .nav-links { display: none; } nav { padding: 16px 20px; } }
+
+    /* ===== HERO ===== */
+    .hero {
+      min-height: 100vh;
+      background: linear-gradient(155deg, #0f2347 0%, #1a365d 45%, #2d4a7a 100%);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.3);
+      color: var(--gold-light); padding: 6px 16px; border-radius: 999px;
+      font-size: 13px; font-weight: 500; margin-bottom: 28px;
+    }
+    .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(40px, 7vw, 72px);
+      font-weight: 900;
+      color: white;
+      line-height: 1.1;
+      max-width: 800px;
+      margin-bottom: 24px;
+    }
+    .hero h1 em { color: var(--gold); font-style: italic; }
+
+    .hero p {
+      font-size: clamp(16px, 2.5vw, 20px);
+      color: rgba(255,255,255,0.72);
+      max-width: 560px;
+      margin-bottom: 48px;
+      line-height: 1.7;
+    }
+
+    .hero-form {
+      display: flex; gap: 10px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 14px;
+      padding: 8px;
+      max-width: 520px;
+      width: 100%;
+      backdrop-filter: blur(8px);
+    }
+    .hero-form input {
+      flex: 1; background: transparent; border: none; outline: none;
+      color: white; font-size: 15px; padding: 8px 14px;
+      font-family: 'Inter', sans-serif;
+    }
+    .hero-form input::placeholder { color: rgba(255,255,255,0.4); }
+    .hero-form button {
+      background: var(--gold); color: var(--navy);
+      border: none; border-radius: 10px;
+      padding: 12px 24px; font-size: 15px; font-weight: 600;
+      cursor: pointer; white-space: nowrap;
+      font-family: 'Inter', sans-serif;
+      transition: background 0.2s;
+    }
+    .hero-form button:hover { background: var(--gold-light); }
+    @media (max-width: 540px) { .hero-form { flex-direction: column; } }
+
+    .hero-sub {
+      margin-top: 20px;
+      font-size: 13px; color: rgba(255,255,255,0.45);
+      display: flex; align-items: center; gap: 16px;
+    }
+    .hero-sub span { display: flex; align-items: center; gap: 5px; }
+
+    .hero-counter {
+      margin-top: 48px; padding: 16px 32px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      display: flex; gap: 40px;
+    }
+    .counter-item { text-align: center; }
+    .counter-number { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--gold); }
+    .counter-label { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+    @media (max-width: 500px) { .hero-counter { gap: 24px; padding: 14px 20px; } .counter-number { font-size: 22px; } }
+
+    /* ===== SECTION SHARED ===== */
+    section { padding: 96px 24px; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px;
+      color: var(--gold); margin-bottom: 14px;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700; color: var(--navy); line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .section-desc { font-size: 17px; color: var(--text-muted); max-width: 580px; line-height: 1.7; }
+
+    /* ===== PROBLEM ===== */
+    .problem { background: var(--cream); }
+    .problem-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px; margin-top: 48px;
+    }
+    .problem-card {
+      background: white; border-radius: 16px; padding: 28px;
+      border: 1.5px solid var(--border);
+    }
+    .problem-card .icon { font-size: 32px; margin-bottom: 14px; }
+    .problem-card h3 { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--navy); margin-bottom: 8px; }
+    .problem-card p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+    /* ===== HOW IT WORKS ===== */
+    .steps {
+      display: flex; flex-direction: column; gap: 0; margin-top: 56px;
+      max-width: 680px;
+    }
+    .step {
+      display: flex; gap: 28px; position: relative; padding-bottom: 40px;
+    }
+    .step:last-child { padding-bottom: 0; }
+    .step-left { display: flex; flex-direction: column; align-items: center; }
+    .step-number {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--navy); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 16px; flex-shrink: 0;
+    }
+    .step-line { width: 2px; flex: 1; background: var(--border); margin-top: 8px; }
+    .step:last-child .step-line { display: none; }
+    .step-content { padding-top: 8px; }
+    .step-content h3 { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--navy); margin-bottom: 8px; }
+    .step-content p { font-size: 15px; color: var(--text-muted); line-height: 1.6; }
+    .step-tag {
+      display: inline-block; background: var(--gold); color: var(--navy);
+      padding: 3px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    /* ===== FEATURES ===== */
+    .features { background: var(--cream); }
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px; margin-top: 56px;
+    }
+    .feature-card {
+      background: white; border-radius: 16px; padding: 32px;
+      border: 1.5px solid var(--border);
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .feature-card:hover { box-shadow: 0 8px 32px rgba(26,54,93,0.1); transform: translateY(-3px); }
+    .feature-icon { font-size: 40px; margin-bottom: 18px; }
+    .feature-card h3 { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--navy); margin-bottom: 10px; }
+    .feature-card p { font-size: 14.5px; color: var(--text-muted); line-height: 1.65; }
+    .feature-card .feature-detail {
+      margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);
+      font-size: 13px; color: var(--text-muted);
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .feature-detail span { display: flex; align-items: center; gap: 7px; }
+
+    /* ===== COMPARISON ===== */
+    .comparison-wrap { overflow-x: auto; margin-top: 48px; }
+    .comparison-table { width: 100%; border-collapse: collapse; min-width: 600px; }
+    .comparison-table th {
+      padding: 14px 18px; text-align: center; font-size: 14px;
+      font-weight: 600; font-family: 'Inter', sans-serif;
+    }
+    .comparison-table th:first-child { text-align: left; }
+    .comparison-table th.highlight { background: var(--navy); color: white; border-radius: 12px 12px 0 0; }
+    .comparison-table td {
+      padding: 13px 18px; font-size: 14px; border-top: 1px solid var(--border);
+      text-align: center; color: var(--text-muted);
+    }
+    .comparison-table td:first-child { text-align: left; color: var(--text); font-weight: 500; }
+    .comparison-table td.highlight { background: rgba(26,54,93,0.04); color: var(--navy); font-weight: 500; }
+    .comparison-table tr:last-child td.highlight:last-child { border-radius: 0 0 12px 12px; }
+    .check { color: var(--success); font-size: 16px; }
+    .cross { color: #e53e3e; font-size: 16px; }
+    .partial { color: var(--gold); font-size: 14px; }
+
+    /* ===== SOURCES ===== */
+    .sources-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px; margin-top: 48px;
+    }
+    .source-card {
+      background: white; border-radius: 12px; padding: 20px;
+      border: 1.5px solid var(--border);
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .source-name { font-weight: 600; font-size: 15px; color: var(--navy); }
+    .source-desc { font-size: 13px; color: var(--text-muted); }
+    .source-period { font-size: 12px; color: var(--gold); font-weight: 500; }
+    .source-free { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 600; color: var(--success); background: #e6f4ed; padding: 2px 8px; border-radius: 999px; margin-top: 4px; }
+
+    /* ===== CTA SECTION ===== */
+    .cta-section {
+      background: linear-gradient(135deg, #0f2347, #1a365d);
+      text-align: center; color: white;
+    }
+    .cta-section h2 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 5vw, 48px); font-weight: 700; margin-bottom: 16px; }
+    .cta-section p { font-size: 17px; color: rgba(255,255,255,0.7); max-width: 520px; margin: 0 auto 40px; line-height: 1.6; }
+    .cta-form { display: flex; gap: 10px; max-width: 480px; margin: 0 auto; }
+    .cta-form input {
+      flex: 1; padding: 13px 18px; border-radius: 10px; border: none;
+      font-size: 15px; font-family: 'Inter', sans-serif; outline: none;
+    }
+    .cta-form button {
+      background: var(--gold); color: var(--navy);
+      border: none; border-radius: 10px; padding: 13px 28px;
+      font-size: 15px; font-weight: 600; cursor: pointer; white-space: nowrap;
+      font-family: 'Inter', sans-serif; transition: background 0.2s;
+    }
+    .cta-form button:hover { background: var(--gold-light); }
+    @media (max-width: 480px) { .cta-form { flex-direction: column; } }
+    .cta-proof { margin-top: 20px; font-size: 13px; color: rgba(255,255,255,0.4); }
+
+    /* ===== SUCCESS STATE ===== */
+    .success-msg {
+      display: none; flex-direction: column; align-items: center; gap: 12px;
+      color: white;
+    }
+    .success-msg .success-icon { font-size: 52px; }
+    .success-msg h3 { font-family: 'Playfair Display', serif; font-size: 24px; }
+    .success-msg p { font-size: 15px; color: rgba(255,255,255,0.7); }
+
+    /* ===== FOOTER ===== */
+    footer {
+      background: #0a1628; color: rgba(255,255,255,0.5);
+      padding: 40px 24px; text-align: center; font-size: 13.5px;
+    }
+    footer .footer-logo { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--gold); margin-bottom: 12px; }
+    footer p { line-height: 1.7; }
+    footer a { color: rgba(255,255,255,0.6); }
+
+    /* ===== ANIMATIONS ===== */
+    .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .fade-in.visible { opacity: 1; transform: none; }
+
+    /* ===== PROTOTYPE CTA ===== */
+    .prototype-banner {
+      background: var(--gold-light);
+      padding: 14px 24px;
+      text-align: center;
+      font-size: 14.5px;
+      color: var(--navy);
+      position: relative;
+      z-index: 200;
+    }
+    .prototype-banner a { color: var(--navy); font-weight: 600; text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<!-- Prototype banner -->
+<div class="prototype-banner">
+  🚀 Il prototipo funzionante è già disponibile — <a href="genealogia.html">provalo subito</a>
+</div>
+
+<!-- Nav -->
+<nav id="main-nav">
+  <a class="nav-logo" href="#"><span>Gene</span>AI</a>
+  <div class="nav-links">
+    <a href="#come-funziona">Come funziona</a>
+    <a href="#funzionalita">Funzionalità</a>
+    <a href="#fonti">Fonti</a>
+    <a href="#waitlist" class="nav-cta">Accesso anticipato</a>
+  </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="dot"></span>
+    Lancio previsto · Fase di validazione
+  </div>
+  <h1>Scopri le radici della<br>tua <em>famiglia</em></h1>
+  <p>Fotografia una lapide, carica un documento storico o inserisci il nome di tuo nonno. Il nostro sistema di Intelligenza Artificiale ricostruisce il tuo albero genealogico attingendo dagli archivi italiani.</p>
+
+  <form class="hero-form" id="hero-form" onsubmit="handleHeroSubmit(event)">
+    <input type="email" placeholder="La tua email per l'accesso anticipato" id="hero-email" required>
+    <button type="submit">Voglio provarlo →</button>
+  </form>
+  <div class="hero-sub">
+    <span>✓ Gratuito durante la beta</span>
+    <span>✓ Nessuna carta di credito</span>
+    <span>✓ Solo italiano</span>
+  </div>
+
+  <div class="hero-counter fade-in" id="hero-counter" style="display:none;">
+    <div class="counter-item">
+      <div class="counter-number" id="counter-signups">0</div>
+      <div class="counter-label">persone in lista d'attesa</div>
+    </div>
+    <div class="counter-item">
+      <div class="counter-number">5M+</div>
+      <div class="counter-label">documenti già indicizzati</div>
+    </div>
+    <div class="counter-item">
+      <div class="counter-number">1861</div>
+      <div class="counter-label">anni di storia accessibili</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PROBLEM ===== -->
+<section class="problem" id="problema">
+  <div class="container">
+    <div class="section-label">Il problema</div>
+    <h2 class="section-title">La genealogia italiana è<br>ancora difficilissima</h2>
+    <p class="section-desc">I tuoi antenati hanno vissuto in Italia, ma gli strumenti disponibili sono progettati per americani, costosi e impossibili da usare senza competenze specialistiche.</p>
+
+    <div class="problem-grid">
+      <div class="problem-card fade-in">
+        <div class="icon">🇺🇸</div>
+        <h3>Strumenti americano-centrici</h3>
+        <p>Ancestry e MyHeritage hanno milioni di record USA, ma i cimiteri di paese toscani o i registri parrocchiali delle località minori non esistono nel loro database.</p>
+      </div>
+      <div class="problem-card fade-in">
+        <div class="icon">💸</div>
+        <h3>Costi proibitivi</h3>
+        <p>MyHeritage blocca a 250 individui nel piano gratuito. Per ricerche serie servono centinaia di euro all'anno, e i dati rimangono di loro proprietà.</p>
+      </div>
+      <div class="problem-card fade-in">
+        <div class="icon">🔐</div>
+        <h3>Archivi ostici e inaccessibili</h3>
+        <p>Antenati e FamilySearch hanno i dati, ma le interfacce sono progettate per archivisti professionisti, non per chi vuole semplicemente sapere da dove viene.</p>
+      </div>
+      <div class="problem-card fade-in">
+        <div class="icon">📜</div>
+        <h3>Competenze specialistiche richieste</h3>
+        <p>Leggere un atto di nascita del 1820 in grafia ottocentesca, distinguere omonimi, decifrare il latino parrocchiale, oggi è roba da pochi eletti.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section id="come-funziona">
+  <div class="container" style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;">
+    <div>
+      <div class="section-label">Come funziona</div>
+      <h2 class="section-title">Tre passi per<br>ritrovare le tue radici</h2>
+      <p class="section-desc">L'AI fa il lavoro difficile. Tu vedi i risultati.</p>
+
+      <div class="steps" style="margin-top:40px;">
+        <div class="step fade-in">
+          <div class="step-left">
+            <div class="step-number">1</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-tag">📷 Fotografia</div>
+            <h3>Scatta una foto</h3>
+            <p>Fotografa una lapide al cimitero, scansiona un documento di famiglia, o inserisci semplicemente nome e date di tuo nonno.</p>
+          </div>
+        </div>
+        <div class="step fade-in">
+          <div class="step-left">
+            <div class="step-number">2</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-tag">🧬 Analisi AI</div>
+            <h3>L'AI estrae e cerca</h3>
+            <p>L'intelligenza artificiale legge il documento, estrae i dati strutturati (nome, cognome, date, luogo, parenti) e li cerca negli archivi italiani pubblici.</p>
+          </div>
+        </div>
+        <div class="step fade-in">
+          <div class="step-left">
+            <div class="step-number">3</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-tag">🌳 Risultati</div>
+            <h3>Vedi l'albero crescere</h3>
+            <p>Le corrispondenze trovate vengono proposte con uno score di confidenza. Sei tu a decidere cosa aggiungere al tuo albero personale. Niente viene modificato automaticamente.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="position:sticky;top:100px;">
+      <div style="background:linear-gradient(135deg,#1a365d,#2d4a7a);border-radius:20px;padding:32px;color:white;box-shadow:0 20px 60px rgba(26,54,93,0.3);">
+        <div style="font-size:13px;opacity:0.6;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px;">Esempio reale</div>
+        <div style="background:rgba(255,255,255,0.08);border-radius:12px;padding:18px;margin-bottom:16px;font-size:13px;">
+          <div style="opacity:0.6;margin-bottom:8px;">📷 Foto caricata: lapide_gragnanella.jpg</div>
+          <div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:12px;font-style:italic;line-height:1.6;opacity:0.85;">
+            "PAOLO AMERICO<br>LOMBARDI<br>7 GEN 1872 · 15 GEN 1953<br>Aia Grande n.23"
+          </div>
+        </div>
+        <div style="font-size:12px;opacity:0.6;margin-bottom:10px;">✨ Dati estratti dall'AI:</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+          <div style="display:flex;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,0.07);border-radius:8px;">
+            <span style="opacity:0.7;">Nome</span><span style="font-weight:500;">Paolo Americo Lombardi</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,0.07);border-radius:8px;">
+            <span style="opacity:0.7;">Nato</span><span style="font-weight:500;">7 gennaio 1872</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,0.07);border-radius:8px;">
+            <span style="opacity:0.7;">Morto</span><span style="font-weight:500;">15 gennaio 1953</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,0.07);border-radius:8px;">
+            <span style="opacity:0.7;">Luogo</span><span style="font-weight:500;">Gragnanella (LU)</span>
+          </div>
+        </div>
+        <div style="margin-top:16px;padding:12px;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.3);border-radius:10px;font-size:13px;">
+          <div style="color:#e0c57a;font-weight:600;margin-bottom:6px;">🔍 3 corrispondenze trovate su Antenati</div>
+          <div style="opacity:0.75;">Atto di nascita · Castelnuovo di Garfagnana · 1872<br>Confidenza: 94%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section class="features" id="funzionalita">
+  <div class="container">
+    <div class="section-label">Funzionalità</div>
+    <h2 class="section-title">Tutto quello che serve per<br>una ricerca seria</h2>
+    <p class="section-desc">Non solo un visualizzatore di alberi: un sistema completo che combina OCR, archivi pubblici e intelligenza artificiale.</p>
+
+    <div class="features-grid">
+      <div class="feature-card fade-in">
+        <div class="feature-icon">📷</div>
+        <h3>OCR da foto lapidi</h3>
+        <p>Scatta una foto di qualsiasi lapide, anche consunta o parzialmente illeggibile. L'AI legge la grafia, corregge gli errori e struttura i dati automaticamente.</p>
+        <div class="feature-detail">
+          <span>✓ Funziona anche su foto di scarsa qualità</span>
+          <span>✓ Riconosce varianti di nomi storici</span>
+          <span>✓ Estrae data, luogo, parentele</span>
+        </div>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon">🗃️</div>
+        <h3>Archivi pubblici italiani</h3>
+        <p>Collegamento automatico con Antenati (Ministero della Cultura), FamilySearch, matricole militari e Catasto Leopoldino toscano. Tutto gratuito, tutto accessibile.</p>
+        <div class="feature-detail">
+          <span>✓ 5+ milioni di documenti indicizzati</span>
+          <span>✓ Atti nascita, matrimonio, morte</span>
+          <span>✓ Registri parrocchiali 1550-1900</span>
+        </div>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon">🧠</div>
+        <h3>Disambiguazione intelligente</h3>
+        <p>Il vero problema della genealogia non è trovare i dati: è capire quale dei tre "Giovanni Lombardi" nati a Castelnuovo nel 1850 è il tuo antenato. L'AI risolve questo.</p>
+        <div class="feature-detail">
+          <span>✓ Pesatura multi-segnale (nome, luogo, date)</span>
+          <span>✓ Score di confidenza trasparente</span>
+          <span>✓ Sei sempre tu a decidere</span>
+        </div>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon">🌳</div>
+        <h3>Albero interattivo</h3>
+        <p>Visualizzazione grafica dell'albero con zoom, navigazione e dettagli per ogni persona. Import/export GEDCOM compatibile con MyHeritage, Ancestry e FamilySearch.</p>
+        <div class="feature-detail">
+          <span>✓ Standard GEDCOM 5.5.1</span>
+          <span>✓ Migra il tuo albero esistente</span>
+          <span>✓ Nessun limite artificiale durante la beta</span>
+        </div>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon">👥</div>
+        <h3>Match tra famiglie</h3>
+        <p>Il sistema trova silenziosamente chi ha gli stessi antenati nel database. Entrambi devono accettare prima di vedere i dettagli dell'altro. I vostri alberi non si fondono mai automaticamente.</p>
+        <div class="feature-detail">
+          <span>✓ Privacy by design</span>
+          <span>✓ Match anonimo fino al consenso</span>
+          <span>✓ Albero sempre privato di default</span>
+        </div>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon">💬</div>
+        <h3>Chat AI genealogista</h3>
+        <p>Fai domande in italiano al tuo assistente genealogico: come trovare un atto parrocchiale del 1830, come interpretare la grafia ottocentesca, dove cercare il "buco 1812-1851".</p>
+        <div class="feature-detail">
+          <span>✓ Specializzato su archivi italiani</span>
+          <span>✓ Conosce il contesto storico locale</span>
+          <span>✓ Risposte pratiche e actionable</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== COMPARISON ===== -->
+<section>
+  <div class="container">
+    <div class="section-label">Confronto</div>
+    <h2 class="section-title">Perché Famalbe è<br>diverso</h2>
+    <div class="comparison-wrap fade-in">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th class="highlight">Famalbe</th>
+            <th>Ancestry</th>
+            <th>MyHeritage</th>
+            <th>FamilySearch</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Focus su archivi italiani</td>
+            <td class="highlight"><span class="check">✓</span></td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="partial">Parziale</span></td>
+          </tr>
+          <tr>
+            <td>Gratuito per la ricerca base</td>
+            <td class="highlight"><span class="check">✓</span></td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="partial">250 persone</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>OCR da foto lapidi con AI</td>
+            <td class="highlight"><span class="check">✓</span></td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="cross">✗</span></td>
+          </tr>
+          <tr>
+            <td>Interfaccia in italiano</td>
+            <td class="highlight"><span class="check">✓</span></td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="partial">Parziale</span></td>
+            <td><span class="partial">Parziale</span></td>
+          </tr>
+          <tr>
+            <td>Chat AI specializzata</td>
+            <td class="highlight"><span class="check">✓</span></td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="cross">✗</span></td>
+          </tr>
+          <tr>
+            <td>I tuoi dati restano tuoi</td>
+            <td class="highlight"><span class="check">✓</span></td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Import/Export GEDCOM libero</td>
+            <td class="highlight"><span class="check">✓</span></td>
+            <td><span class="partial">A pagamento</span></td>
+            <td><span class="partial">Limitato</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SOURCES ===== -->
+<section class="problem" id="fonti">
+  <div class="container">
+    <div class="section-label">Fonti dati</div>
+    <h2 class="section-title">Tutte le fonti italiane,<br>tutte gratuite</h2>
+    <p class="section-desc">Famalbe non inventa dati. Aggrega fonti primarie pubbliche italiane e le rende accessibili a tutti, non solo agli archivisti professionisti.</p>
+
+    <div class="sources-grid">
+      <div class="source-card fade-in">
+        <div class="source-name">Antenati</div>
+        <div class="source-desc">Archivi di Stato italiani. Atti nascita, matrimonio, morte, registri parrocchiali.</div>
+        <div class="source-period">1550 – 1900</div>
+        <span class="source-free">✓ Gratuito</span>
+      </div>
+      <div class="source-card fade-in">
+        <div class="source-name">FamilySearch</div>
+        <div class="source-desc">Milioni di record italiani indicizzati, inclusi molti registri parrocchiali.</div>
+        <div class="source-period">1600 – 1950</div>
+        <span class="source-free">✓ Gratuito</span>
+      </div>
+      <div class="source-card fade-in">
+        <div class="source-name">Matricole militari</div>
+        <div class="source-desc">Nome, padre, madre, nascita, professione, descrizione fisica. Fonte rarissima per il 1800.</div>
+        <div class="source-period">1840 – 1920</div>
+        <span class="source-free">✓ Pubblico</span>
+      </div>
+      <div class="source-card fade-in">
+        <div class="source-name">Catasto Leopoldino</div>
+        <div class="source-desc">Proprietà terriere, capofamiglia, parentele in Toscana. Unico per l'area regionale.</div>
+        <div class="source-period">1820 – 1835</div>
+        <span class="source-free">✓ Toscana</span>
+      </div>
+      <div class="source-card fade-in">
+        <div class="source-name">Lapidi crowdsourced</div>
+        <div class="source-desc">Foto di lapidi caricate dagli utenti, processate via OCR AI e verificate dalla community.</div>
+        <div class="source-period">1880 – oggi</div>
+        <span class="source-free">✓ Community</span>
+      </div>
+      <div class="source-card fade-in">
+        <div class="source-name">GEDCOM importati</div>
+        <div class="source-desc">Alberi da MyHeritage, Ancestry, GeneaNet donati al database condiviso dagli utenti.</div>
+        <div class="source-period">Tutti i periodi</div>
+        <span class="source-free">✓ Consensuale</span>
+      </div>
+    </div>
+
+    
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="cta-section" id="waitlist">
+  <div class="container" style="max-width:640px;text-align:center;">
+    <div id="cta-default">
+      <div style="font-size:48px;margin-bottom:20px;">🌳</div>
+      <h2>Pronto a scoprire la tua famiglia?</h2>
+      <p>Iscriviti alla lista d'attesa. Sarai tra i primi a provare Famalbe quando apriremo l'accesso.</p>
+      <form class="cta-form" id="cta-form" onsubmit="handleCtaSubmit(event)">
+        <input type="email" id="cta-email" placeholder="tua@email.it" required>
+        <button type="submit">Iscrivimi →</button>
+      </form>
+      <p class="cta-proof">Gratis. Nessuno spam. Solo un'email quando apriamo.</p>
+    </div>
+    <div class="success-msg" id="cta-success">
+      <div class="success-icon">🎉</div>
+      <h3>Sei nella lista!</h3>
+      <p>Ti avviseremo non appena Famalbe sarà disponibile. Nel frattempo, puoi già provare il prototipo.</p>
+      <a href="genealogia.html" style="background:var(--gold);color:var(--navy);padding:12px 28px;border-radius:10px;text-decoration:none;font-weight:600;font-size:15px;margin-top:8px;display:inline-block;">
+        Prova il prototipo ora →
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-logo">Famalbe</div>
+  <p>Progetto in fase di validazione · Made in Toscana con ❤️<br>
+  Un progetto di <a href="#">Simone Lombardi</a></p>
+</footer>
+
+<script>
+// Nav scroll effect
+const mainNav = document.getElementById('main-nav');
+window.addEventListener('scroll', () => {
+  mainNav.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// Fade-in observer
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// Email validation
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// Counter animation
+function animateCounter(el, target, suffix = '') {
+  let current = 0;
+  const step = Math.ceil(target / 40);
+  const timer = setInterval(() => {
+    current = Math.min(current + step, target);
+    el.textContent = current.toLocaleString('it-IT') + suffix;
+    if (current >= target) clearInterval(timer);
+  }, 40);
+}
+
+// Simulate signup count from localStorage
+let signupCount = parseInt(localStorage.getItem('famalbe_signups') || '0');
+if (signupCount > 0) {
+  const counterEl = document.getElementById('hero-counter');
+  counterEl.style.display = 'flex';
+  document.getElementById('counter-signups').textContent = signupCount;
+}
+
+// Hero form
+function handleHeroSubmit(e) {
+  e.preventDefault();
+  const email = document.getElementById('hero-email').value.trim();
+  if (!isValidEmail(email)) return;
+  registerEmail(email);
+  // Show counter
+  signupCount++;
+  localStorage.setItem('famalbe_signups', signupCount);
+  const counterEl = document.getElementById('hero-counter');
+  counterEl.style.display = 'flex';
+  counterEl.classList.add('visible');
+  animateCounter(document.getElementById('counter-signups'), signupCount);
+  document.getElementById('hero-email').value = '';
+  showToast('🎉 Sei nella lista! Ti avviseremo al lancio.');
+}
+
+// CTA form
+function handleCtaSubmit(e) {
+  e.preventDefault();
+  const email = document.getElementById('cta-email').value.trim();
+  if (!isValidEmail(email)) return;
+  registerEmail(email);
+  document.getElementById('cta-default').style.display = 'none';
+  const successEl = document.getElementById('cta-success');
+  successEl.style.display = 'flex';
+  successEl.style.flexDirection = 'column';
+  successEl.style.alignItems = 'center';
+  successEl.style.gap = '12px';
+}
+
+// ──────────────────────────────────────────────────────────────
+// GOOGLE FORMS CONFIG
+// 1. Vai su forms.google.com → crea un form con una domanda "Email" di tipo Email
+// 2. Clicca "Anteprima" (occhio) → tasto destro sul campo email → "Ispeziona"
+// 3. Cerca name="entry.XXXXXXXXXX" → copia il numero
+// 4. Nella URL del form copia l'ID: forms/d/e/QUESTO_QUI/viewform
+// 5. Sostituisci i due valori qui sotto
+const GFORMS_URL  = 'https://docs.google.com/forms/d/e/INSERISCI_ID_FORM/formResponse';
+const GFORMS_ENTRY = 'entry.INSERISCI_ID_CAMPO';
+// ──────────────────────────────────────────────────────────────
+
+function registerEmail(email) {
+  // Salva localmente (backup offline)
+  const emails = JSON.parse(localStorage.getItem('famalbe_waitlist') || '[]');
+  if (!emails.includes(email)) {
+    emails.push(email);
+    localStorage.setItem('famalbe_waitlist', JSON.stringify(emails));
+  }
+
+  // Invia a Google Forms (no-cors: non riceviamo risposta ma l'invio funziona)
+  if (!GFORMS_URL.includes('INSERISCI')) {
+    const body = new URLSearchParams();
+    body.append(GFORMS_ENTRY, email);
+    fetch(GFORMS_URL, { method: 'POST', mode: 'no-cors', body }).catch(() => {});
+  }
+}
+
+// Toast
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1a365d;color:white;padding:14px 20px;border-radius:10px;font-size:14px;box-shadow:0 4px 20px rgba(0,0,0,0.2);z-index:999;animation:slideIn 0.3s ease;max-width:320px;';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
+
+const style = document.createElement('style');
+style.textContent = '@keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}';
+document.head.appendChild(style);
+</script>
+</body>
+</html>
