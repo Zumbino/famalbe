@@ -349,6 +349,38 @@
     }
 
     /* ===== RESPONSIVE ===== */
+    @media (max-width: 640px) {
+      .comparison-wrap { overflow-x: visible; }
+      .comparison-table, .comparison-table tbody, .comparison-table tr, .comparison-table td { display: block; width: 100%; }
+      .comparison-table thead { display: none; }
+      .comparison-table tr {
+        margin-bottom: 14px;
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .comparison-table td {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 10px 14px; font-size: 13.5px; border-top: 1px solid var(--border);
+        text-align: left;
+      }
+      .comparison-table td:first-child {
+        background: var(--navy); color: white; font-weight: 600;
+        font-size: 14px; border-top: none; border-radius: 0;
+      }
+      .comparison-table td:first-child::after { display: none; }
+      .comparison-table td::before {
+        content: attr(data-label);
+        font-weight: 600; font-size: 12px; color: var(--text-muted);
+        flex-shrink: 0; margin-right: 12px;
+      }
+      .comparison-table td.highlight {
+        background: rgba(26,54,93,0.06);
+        border-top: 1px solid rgba(26,54,93,0.12);
+      }
+      .comparison-table td.highlight::before { color: var(--navy); }
+    }
+
     @media (max-width: 768px) {
       section { padding: 60px 20px; }
 
@@ -648,52 +680,52 @@
         <tbody>
           <tr>
             <td>Focus su archivi italiani</td>
-            <td class="highlight"><span class="check">✓</span></td>
-            <td><span class="cross">✗</span></td>
-            <td><span class="cross">✗</span></td>
-            <td><span class="partial">Parziale</span></td>
+            <td class="highlight" data-label="Famalbe"><span class="check">✓</span></td>
+            <td data-label="Ancestry"><span class="cross">✗</span></td>
+            <td data-label="MyHeritage"><span class="cross">✗</span></td>
+            <td data-label="FamilySearch"><span class="partial">Parziale</span></td>
           </tr>
           <tr>
             <td>Gratuito per la ricerca base</td>
-            <td class="highlight"><span class="check">✓</span></td>
-            <td><span class="cross">✗</span></td>
-            <td><span class="partial">250 persone</span></td>
-            <td><span class="check">✓</span></td>
+            <td class="highlight" data-label="Famalbe"><span class="check">✓</span></td>
+            <td data-label="Ancestry"><span class="cross">✗</span></td>
+            <td data-label="MyHeritage"><span class="partial">250 persone</span></td>
+            <td data-label="FamilySearch"><span class="check">✓</span></td>
           </tr>
           <tr>
             <td>OCR da foto lapidi con AI</td>
-            <td class="highlight"><span class="check">✓</span></td>
-            <td><span class="cross">✗</span></td>
-            <td><span class="cross">✗</span></td>
-            <td><span class="cross">✗</span></td>
+            <td class="highlight" data-label="Famalbe"><span class="check">✓</span></td>
+            <td data-label="Ancestry"><span class="cross">✗</span></td>
+            <td data-label="MyHeritage"><span class="cross">✗</span></td>
+            <td data-label="FamilySearch"><span class="cross">✗</span></td>
           </tr>
           <tr>
             <td>Interfaccia in italiano</td>
-            <td class="highlight"><span class="check">✓</span></td>
-            <td><span class="cross">✗</span></td>
-            <td><span class="partial">Parziale</span></td>
-            <td><span class="partial">Parziale</span></td>
+            <td class="highlight" data-label="Famalbe"><span class="check">✓</span></td>
+            <td data-label="Ancestry"><span class="cross">✗</span></td>
+            <td data-label="MyHeritage"><span class="partial">Parziale</span></td>
+            <td data-label="FamilySearch"><span class="partial">Parziale</span></td>
           </tr>
           <tr>
             <td>Chat AI specializzata</td>
-            <td class="highlight"><span class="check">✓</span></td>
-            <td><span class="cross">✗</span></td>
-            <td><span class="cross">✗</span></td>
-            <td><span class="cross">✗</span></td>
+            <td class="highlight" data-label="Famalbe"><span class="check">✓</span></td>
+            <td data-label="Ancestry"><span class="cross">✗</span></td>
+            <td data-label="MyHeritage"><span class="cross">✗</span></td>
+            <td data-label="FamilySearch"><span class="cross">✗</span></td>
           </tr>
           <tr>
             <td>I tuoi dati restano tuoi</td>
-            <td class="highlight"><span class="check">✓</span></td>
-            <td><span class="cross">✗</span></td>
-            <td><span class="cross">✗</span></td>
-            <td><span class="check">✓</span></td>
+            <td class="highlight" data-label="Famalbe"><span class="check">✓</span></td>
+            <td data-label="Ancestry"><span class="cross">✗</span></td>
+            <td data-label="MyHeritage"><span class="cross">✗</span></td>
+            <td data-label="FamilySearch"><span class="check">✓</span></td>
           </tr>
           <tr>
             <td>Import/Export GEDCOM libero</td>
-            <td class="highlight"><span class="check">✓</span></td>
-            <td><span class="partial">A pagamento</span></td>
-            <td><span class="partial">Limitato</span></td>
-            <td><span class="check">✓</span></td>
+            <td class="highlight" data-label="Famalbe"><span class="check">✓</span></td>
+            <td data-label="Ancestry"><span class="partial">A pagamento</span></td>
+            <td data-label="MyHeritage"><span class="partial">Limitato</span></td>
+            <td data-label="FamilySearch"><span class="check">✓</span></td>
           </tr>
         </tbody>
       </table>
@@ -739,12 +771,7 @@
         <div class="source-period">1880 – oggi</div>
         <span class="source-free">✓ Community</span>
       </div>
-      <div class="source-card fade-in">
-        <div class="source-name">GEDCOM importati</div>
-        <div class="source-desc">Alberi da MyHeritage, Ancestry, GeneaNet donati al database condiviso dagli utenti.</div>
-        <div class="source-period">Tutti i periodi</div>
-        <span class="source-free">✓ Consensuale</span>
-      </div>
+      
     </div>
 
     
@@ -779,7 +806,7 @@
 <footer>
   <div class="footer-logo">Famalbe</div>
   <p>Progetto in fase di validazione · Made in Toscana con ❤️<br>
-  Un progetto di <a href="#">Simone Lombardi</a></p>
+  Un progetto di <a href="#">Zumbino</a></p>
 </footer>
 
 <script>
