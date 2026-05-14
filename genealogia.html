@@ -713,14 +713,24 @@
     <div class="page-header">
       <h2 class="section-title">📷 OCR Lapidi <span>Carica una foto e l'AI estrae i dati automaticamente</span></h2>
     </div>
+
+    <!-- Demo notice -->
+    <div style="background:#fef9e7;border:1.5px solid #f6d860;border-radius:10px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:flex-start;gap:12px;">
+      <span style="font-size:20px;flex-shrink:0;">🧪</span>
+      <div>
+        <strong style="color:#92600a;font-size:14px;">Questa è una demo funzionante</strong>
+        <p style="font-size:13px;color:#a16207;margin-top:3px;line-height:1.5;">Carica <strong>qualsiasi foto</strong> — una lapide, un documento scritto a mano, una ricevuta — e l'AI estrarrà tutti i dati testuali che riesce a leggere. Il sistema funziona su ogni immagine, non solo su lapidi reali.</p>
+      </div>
+    </div>
+
     <div class="ocr-layout" style="flex:1;min-height:0;">
       <!-- Left: upload + preview -->
       <div style="display:flex;flex-direction:column;gap:16px;">
         <div class="upload-zone" id="upload-zone">
           <input type="file" accept="image/*" id="file-input" onchange="handleFileSelect(event)">
-          <div class="upload-icon">🪦</div>
-          <h3>Trascina la foto qui</h3>
-          <p>Foto di lapidi, atti di nascita, documenti storici, foto d'archivio</p>
+          <div class="upload-icon">📂</div>
+          <h3>Carica qualsiasi foto</h3>
+          <p>Lapide, documento scritto a mano, atto storico — l'AI legge e struttura il testo automaticamente</p>
           <div class="upload-formats">
             <span class="format-badge">JPG</span>
             <span class="format-badge">PNG</span>
@@ -742,8 +752,8 @@
       <div style="display:flex;flex-direction:column;gap:16px;">
         <div id="ocr-empty" class="empty-state" style="background:white;border-radius:var(--radius);border:1.5px solid var(--border);flex:1;">
           <div class="empty-icon">🔍</div>
-          <h3 style="font-family:'Playfair Display',serif;color:var(--navy);">Nessuna analisi ancora</h3>
-          <p>Carica la foto di una lapide o di un documento storico per estrarre automaticamente i dati genealogici</p>
+          <h3 style="font-family:'Playfair Display',serif;color:var(--navy);">Carica una foto qualsiasi</h3>
+          <p>L'AI analizza qualunque immagine con testo: lapidi, documenti scritti a mano, atti storici. È una demo — funziona su ogni foto che carichi.</p>
         </div>
         <div class="ocr-results" id="ocr-results" style="display:none;">
           <div class="ocr-results-header">
